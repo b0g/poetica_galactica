@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Poetica Galactica</title>
+  <meta name="description" content="Dans l’extensible infini s’impriment quelques écrits.">
+  <meta name="theme-color" content="#0d0d0d">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <!-- Fond étoilé (canvas, animé par galaxy.js) -->
+  <canvas id="galaxie" aria-hidden="true"></canvas>
+  <div id="voile" aria-hidden="true"></div>
+
+  <!-- Marque -->
+  <header class="marque">
+    <h1>Poetica Galactica</h1>
+    <p>Dans l’extensible infini s’impriment quelques écrits</p>
+  </header>
+
+  <!-- Constellation de feuilles (remplie par app.js) -->
+  <main id="constellation" aria-label="Constellation de poèmes"></main>
+
+  <!-- Menu : page tapée par la machine à écrire -->
+  <div id="page-machine" class="page-machine">
+    <pre id="machine-texte" class="machine-texte"></pre>
+  </div>
+
+  <!-- Machine à écrire (flat) -->
+  <button id="machine" class="machine" type="button"
+          aria-expanded="false" aria-controls="page-machine"
+          aria-label="Ouvrir le menu des écritures et du contact">
+    <svg viewBox="0 0 120 96" aria-hidden="true" focusable="false">
+      <!-- feuille engagée dans le rouleau -->
+      <rect x="34" y="2" width="52" height="32" rx="2" fill="#f7f5ee" opacity="0.95"/>
+      <rect x="40" y="9"  width="40" height="2.4" rx="1.2" fill="#b9c3d6"/>
+      <rect x="40" y="15" width="34" height="2.4" rx="1.2" fill="#b9c3d6"/>
+      <rect x="40" y="21" width="38" height="2.4" rx="1.2" fill="#b9c3d6"/>
+      <!-- levier de chariot -->
+      <path d="M104 27 L118 20" stroke="#2a5ede" stroke-width="4" stroke-linecap="round"/>
+      <!-- rouleau -->
+      <rect x="14" y="32" width="92" height="14" rx="7" fill="#2a5ede"/>
+      <!-- corps -->
+      <rect x="6" y="45" width="108" height="47" rx="10" fill="#3b7bff"/>
+      <!-- touches : les trois lignes du burger -->
+      <g fill="#dbe7ff">
+        <rect x="15"   y="50" width="8"   height="5" rx="2"/>
+        <rect x="26.5" y="50" width="8"   height="5" rx="2"/>
+        <rect x="38"   y="50" width="8"   height="5" rx="2"/>
+        <rect x="49.5" y="50" width="8"   height="5" rx="2"/>
+        <rect x="61"   y="50" width="8"   height="5" rx="2"/>
+        <rect x="72.5" y="50" width="8"   height="5" rx="2"/>
+        <rect x="84"   y="50" width="8"   height="5" rx="2"/>
+        <rect x="95.5" y="50" width="8"   height="5" rx="2"/>
+      </g>
+      <g fill="#dbe7ff">
+        <rect x="12"  y="58" width="8.5" height="5" rx="2"/>
+        <rect x="23"  y="58" width="8.5" height="5" rx="2"/>
+        <rect x="34"  y="58" width="8.5" height="5" rx="2"/>
+        <rect x="45"  y="58" width="8.5" height="5" rx="2"/>
+        <rect x="56"  y="58" width="8.5" height="5" rx="2"/>
+        <rect x="67"  y="58" width="8.5" height="5" rx="2"/>
+        <rect x="78"  y="58" width="8.5" height="5" rx="2"/>
+        <rect x="89"  y="58" width="8.5" height="5" rx="2"/>
+        <rect x="100" y="58" width="8.5" height="5" rx="2"/>
+      </g>
+      <g fill="#dbe7ff">
+        <rect x="21" y="66" width="8.5" height="5" rx="2"/>
+        <rect x="33" y="66" width="8.5" height="5" rx="2"/>
+        <rect x="45" y="66" width="8.5" height="5" rx="2"/>
+        <rect x="57" y="66" width="8.5" height="5" rx="2"/>
+        <rect x="69" y="66" width="8.5" height="5" rx="2"/>
+        <rect x="81" y="66" width="8.5" height="5" rx="2"/>
+        <rect x="93" y="66" width="8.5" height="5" rx="2"/>
+      </g>
+      <!-- barre d'espace -->
+      <rect x="42" y="77" width="36" height="8" rx="4" fill="#eaf1ff"/>
+      <!-- pieds -->
+      <rect x="20" y="90" width="16" height="6" rx="3" fill="#2a5ede"/>
+      <rect x="84" y="90" width="16" height="6" rx="3" fill="#2a5ede"/>
+    </svg>
+  </button>
+
+  <script src="assets/js/poemes.js"></script>
+  <script src="assets/js/galaxy.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

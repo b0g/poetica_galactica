@@ -1,0 +1,409 @@
+/* ============================================================
+   Poetica Galactica — V1
+   Flat design : noir profond, points colorés, feuilles de papier
+   légèrement transparentes qui flottent en 3D.
+   ============================================================ */
+
+:root {
+  --noir: #0d0d0d;
+  --papier: 244, 241, 232;      /* rgb du papier */
+  --papier-opacite: 0.8;        /* feuilles légèrement transparentes */
+  --encre: #241f18;
+  --bleu: #3b7bff;
+  --bleu-fonce: #2a5ede;
+  --bleu-clair: #7aa8ff;
+  --texte-clair: #eaeefb;
+  /* Une seule police pour tout le site : machine à écrire */
+  --fonte: "Courier Prime", "Courier New", "Nimbus Mono PS", "Liberation Mono",
+    "DejaVu Sans Mono", Courier, monospace;
+
+  /* Texture papier : une image WebP de 768 × 768 (31 Ko) posée en `multiply`
+     sur le fond. Le motif est un froissé de deux échelles : une crêpe
+     (turbulence 0,030 × 4 octaves) et des plis plus larges (turbulence 0,009 ×
+     2 octaves), éclairées séparément puis multipliées, et une trame de grain.
+     Pourquoi une image et non un filtre SVG : le même motif écrit en filtre SVG
+     inline coûtait ~4,8 s par clic dans Firefox (voir « Régénérer la texture »
+     dans README.md). Une image n'est calculée qu'une fois.
+     La recette du motif et sa régénération sont documentées dans README.md. */
+  --papier-url: url("../img/papier.webp");
+  /* Taille de la tuile du motif, en px. Doit correspondre à l'image. */
+  --papier-tuile: 768px;
+}
+
+/* Texture papier commune à toutes les surfaces : vignettes flottantes, poème
+   ouvert, page de la machine à écrire. Le motif se multiplie au fond, donc le
+   texte reste net et l'opacité de la feuille n'est jamais touchée (correction
+   du clignotement d'ouverture préservée). */
+.papier,
+.page-machine {
+  background-image: var(--papier-url);
+  background-size: var(--papier-tuile) var(--papier-tuile);
+  background-repeat: repeat;
+  background-blend-mode: multiply;
+  /* Coin du motif propre à chaque feuille (posé par app.js) : évite que toutes
+     les vignettes affichent la même portion de papier. */
+  background-position: var(--papier-x, 0) var(--papier-y, 0);
+}
+
+* { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  background-color: var(--noir);
+  /* Fond porté par le CSS, derrière le canvas (transparent) :
+     base très sombre + halo bleu/violet au centre, + voile teal discret. */
+  background-image:
+    radial-gradient(1100px 780px at 62% 42%,
+      #171a3a 0%,
+      rgba(20, 22, 50, 0.55) 32%,
+      rgba(13, 13, 13, 0) 74%),
+    radial-gradient(1700px 1300px at 50% 55%,
+      rgba(10, 66, 71, 0.16) 0%,
+      rgba(13, 13, 13, 0) 70%);
+  background-attachment: fixed;
+  color: var(--texte-clair);
+  font-family: var(--fonte);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+#galaxie {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ---------- Marque ---------- */
+.marque {
+  position: fixed;
+  top: 26px;
+  left: 30px;
+  z-index: 6;
+  pointer-events: none;
+}
+.marque h1 {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(var(--papier), 0.92);
+}
+.marque p {
+  margin: 0.7rem 0 0;
+  font-size: 0.82rem;
+  color: rgba(234, 238, 251, 0.5);
+}
+
+/* ---------- Constellation ---------- */
+/* Pas de perspective ni de transform ici : sinon la constellation crée un
+   stacking context et la feuille ouverte (z-index 60) resterait coincée sous
+   le voile (z-index 40). Le z-index est donc porté par la constellation
+   elle-même, et remonté en mode lecture. */
+#constellation {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+}
+body.lecture #constellation { z-index: 50; }
+
+.feuille {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w, 240px);
+  transform:
+    perspective(1200px)
+    translate(-50%, -50%)
+    translate3d(calc(var(--mx, 0px) * var(--prof, 1)), calc(var(--my, 0px) * var(--prof, 1)), var(--z, 0px))
+    rotateY(var(--ry, 0deg))
+    rotateZ(var(--rz, 0deg));
+  cursor: pointer;
+  transition: opacity 0.5s ease, filter 0.5s ease;
+}
+.feuille:focus-visible { outline: none; }
+.feuille:focus-visible .papier {
+  outline: 2px solid var(--bleu-clair);
+  outline-offset: 5px;
+}
+
+.papier {
+  position: relative;
+  padding: 17px 18px 15px;
+  border: 1px solid rgba(var(--papier), 0.6);
+  border-radius: 3px;
+  background-color: rgba(var(--papier), var(--papier-opacite));
+  color: var(--encre);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  /* Jamais une opacité de 1 : au passage à 1, le navigateur change le chemin
+     de rendu de la feuille, ce qui produit un clignotement à la toute fin de
+     l'animation d'ouverture (re-rasterisation). 0,995 est invisible à l'œil. */
+  opacity: 0.995;
+  -webkit-backdrop-filter: blur(7px) saturate(1.1);
+  backdrop-filter: blur(7px) saturate(1.1);
+  animation: flotte var(--duree, 8s) ease-in-out infinite;
+  animation-delay: var(--retard, 0s);
+  will-change: transform;
+  /* Le halo arrive avec la feuille : même durée et même courbe que l'ouverture. */
+  transition: box-shadow 0.6s cubic-bezier(0.22, 0.9, 0.26, 1), transform 0.35s ease;
+}
+.feuille:hover .papier {
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(122, 168, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+@keyframes flotte {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  50%  { transform: translate(var(--derive, 6px), -12px) rotate(0.5deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+.titre {
+  margin: 0;
+  padding-bottom: 9px;
+  border-bottom: 1px solid rgba(36, 31, 24, 0.18);
+  font-size: 0.88rem;
+  line-height: 1.4;
+  font-weight: 400;
+  color: #1b1710;
+}
+
+.texte { display: none; }
+
+.pied {
+  display: none;
+  margin: 18px 0 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: rgba(36, 31, 24, 0.5);
+}
+
+/* ---------- Lecture plein écran ---------- */
+.fermer {
+  display: none;
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(36, 31, 24, 0.25);
+  background: rgba(36, 31, 24, 0.05);
+  color: var(--encre);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  place-items: center;
+  transition: background 0.2s ease;
+}
+.fermer:hover { background: rgba(36, 31, 24, 0.14); }
+
+.feuille.active {
+  position: fixed;
+  inset: 0;
+  top: 0;
+  left: 0;
+  width: auto;
+  transform: none;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+}
+.feuille.active .papier {
+  width: min(92vw, 700px);
+  max-height: 84vh;
+  overflow: auto;
+  padding: 42px 46px 34px;
+  border-radius: 4px;
+  border-color: rgba(255, 255, 255, 0.85);
+  /* +2 sur le fond pour compenser le voile de 0,5 % : le blanc rendu reste
+     exactement #fcfcf9. La texture papier est un `background-image` à part,
+     elle survit donc à ce remplacement de `background-color`. */
+  background-color: #fefefb;
+  color: #17130d;
+  animation: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.5),
+    0 30px 80px rgba(0, 0, 0, 0.75),
+    0 0 150px rgba(160, 190, 255, 0.35);
+}
+.feuille.active .titre {
+  font-size: 1.45rem;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+  color: #14110b;
+}
+.feuille.active .texte {
+  display: block;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: inherit;
+  font-size: 0.96rem;
+  line-height: 1.75;
+}
+.feuille.active .pied { display: block; }
+.feuille.active .fermer {
+  display: grid;
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  z-index: 70;
+  color: #f4f1e8;
+  border-color: rgba(244, 241, 232, 0.35);
+  background: rgba(244, 241, 232, 0.1);
+}
+.feuille.active .fermer:hover { background: rgba(244, 241, 232, 0.22); }
+
+body.lecture .feuille:not(.active) {
+  opacity: 0;
+  filter: blur(6px);
+  pointer-events: none;
+}
+
+/* Retour des feuilles après fermeture : elles réapparaissent en cascade, pas
+   toutes ensemble. Chaque feuille porte son propre retard dans --retour (posé
+   par app.js au moment de fermer) ; la classe `retour` ne vit sur <body> que
+   le temps de la cascade, donc le délai ne s'applique jamais à l'ouverture.
+   Pendant la cascade, une feuille pas encore revenue ne capte aucun clic. */
+body.retour .feuille:not(.active) {
+  transition-delay: var(--retour, 0ms);
+  pointer-events: none;
+}
+
+#voile {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: radial-gradient(85% 85% at 50% 45%, rgba(4, 5, 12, 0.78), rgba(1, 1, 4, 0.95));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+}
+body.lecture #voile { opacity: 1; pointer-events: auto; }
+
+/* ---------- Machine à écrire (menu) ---------- */
+.machine {
+  position: fixed;
+  left: 26px;
+  bottom: 34px;
+  z-index: 31;
+  width: 122px;
+  height: 98px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.55));
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.machine:hover { transform: translateY(-3px); }
+.machine:focus-visible {
+  outline: 2px solid var(--bleu-clair);
+  outline-offset: 8px;
+  border-radius: 12px;
+}
+.machine svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+
+.page-machine {
+  position: fixed;
+  left: 26px;
+  bottom: 150px;
+  z-index: 30;
+  width: min(420px, calc(100vw - 52px));
+  max-height: min(64vh, 520px);
+  overflow: auto;
+  padding: 22px 22px 24px;
+  border: 1px solid rgba(var(--papier), 0.55);
+  border-radius: 3px;
+  background-color: rgba(var(--papier), 0.94);
+  color: var(--encre);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  transform-origin: bottom center;
+  transform: translateY(12px) scaleY(0.04);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
+}
+body.machine-ouverte .page-machine {
+  transform: translateY(0) scaleY(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.machine-texte {
+  margin: 0;
+  font-family: var(--fonte);
+  font-size: 0.78rem;
+  line-height: 1.62;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #2a2419;
+}
+.curseur { color: var(--bleu-fonce); }
+.machine-texte.tape .curseur { animation: clignote 0.9s steps(1) infinite; }
+@keyframes clignote {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 860px) {
+  body { overflow: auto; }
+
+  #constellation {
+    position: relative;
+    inset: auto;
+    height: auto;
+    min-height: 100vh;
+    perspective: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 130px 18px 240px;
+  }
+  .feuille {
+    position: static;
+    left: auto;
+    top: auto;
+    width: min(88vw, 420px);
+    transform: none !important;
+  }
+  .papier { animation: none; }
+  .titre { font-size: 1rem; }
+  .feuille.active {
+    position: fixed;
+    inset: 0;
+    top: 0;
+    left: 0;
+  }
+  .feuille.active .papier {
+    width: 94vw;
+    max-height: 86vh;
+    padding: 30px 24px 28px;
+  }
+  .feuille.active .titre { font-size: 1.2rem; }
+  .marque { top: 18px; left: 18px; }
+  .marque h1 { font-size: 0.9rem; letter-spacing: 0.26em; }
+  .marque p { font-size: 0.82rem; }
+  .machine { left: 16px; bottom: 26px; width: 100px; height: 80px; }
+  
+  .page-machine { left: 16px; bottom: 124px; width: calc(100vw - 32px); }
+}
+
+/* ---------- Mouvement réduit ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .papier { animation: none !important; }
+  #voile { transition: none; }
+}
