@@ -17,7 +17,7 @@ window.POEMES = [
     source: "machine à écrire",
     x: 24, y: 22, z: 40, ry: -7, rz: -1.5, w: 330,
     texte:
-`A quoi pensent les étoiles ?
+      `A quoi pensent les étoiles ?
 Connaissent t-elles les couchers de soleil ?
 Est-ce qu'elles se demandent quel temps il a fait hier ?
 Peut être qu'elles ont peur du noir
@@ -28,7 +28,7 @@ Elles te regardent
 T'agiter pour du vent
 Elles te regardent
 Nager dans ton bol de contentement
-Flotter a la surface de ton interieur
+Flotter a la surface de ton intérieur
 Parler comme un rocher du dedans
 Et parfois, le courage d'une paquerette`
   },
@@ -39,7 +39,7 @@ Et parfois, le courage d'une paquerette`
     source: "machine à écrire",
     x: 56, y: 13, z: 120, ry: 6, rz: 1, w: 345,
     texte:
-`A quelle allure tombe la pluie ?
+      `À quelle allure tombe la pluie ?
 
 A la vitesse de ta voix, qui regrette le soleil
 Rapide comme la caresse, d'un chat sur un tapis
@@ -51,7 +51,7 @@ Ca frappe les tuiles avec du temps
 Tu la sens couler dans tes bottes
 Écoute
 
-Rien n'a besoin de te proteger
+Rien n'a besoin de te protéger
 Écoute
 La chaleur viens du mouvement
 
@@ -67,9 +67,9 @@ Sous ton regard brillant`
     source: "dictée — titre provisoire",
     x: 84, y: 25, z: 60, ry: -5, rz: 2, w: 255,
     texte:
-`Brumes et matins dans un muscle froissé,
+      `Brumes et matins dans un muscle froissé,
 Buffle en patin et musque osé,
-Le sol attend que je sorte le tambouriné de mes pieds,
+Le sol attend que je sorte le tambouriner de mes pieds,
 Doucement.
 Je te rejoins, animale ou anifemelle,
 ani kouni je sors du lit.`
@@ -81,19 +81,19 @@ ani kouni je sors du lit.`
     source: "machine à écrire",
     x: 40, y: 50, z: 150, ry: 4, rz: -1, w: 325,
     texte:
-`De quoi parlent les pierres ?
+      `De quoi parlent les pierres ?
 
-Sans yeux surement pas de la pluie ni du beau temps
-Sans main ni vetements pas de la temperature non plus
+Sans yeux sûrement pas de la pluie ni du beau temps
+Sans main ni vêtements pas de la température non plus
 Sans battements
-        peuvent'elles parler d'amour ?
-A mon avis, ellesne parlent pas, Elles CRIENT
+        peuvent t'elles parler d'amour ?
+À mon avis, elles ne parlent pas, Elles CRIENT
 ELLES CRIENT, parce que le sol bouge trop
-ELLES CRIENT, carx les oiseaux sont trop loin
+ELLES CRIENT, car les oiseaux sont trop loin
 ELLES CRIENT, car elles n'arrivent pas a se toucher
-Parfois si laisse le silence t'habiter,
+Parfois si tu laisse le silence t'habiter,
         tu pourrais les entendre chanter
-Mais c'est la l'exeption, caché dans un paradoxe
+Mais c'est la l'exception, caché dans un paradoxe
 Existe, doux et plaintif
 le chant des ...`
   },
@@ -104,7 +104,7 @@ le chant des ...`
     source: "machine à écrire",
     x: 73, y: 50, z: 30, ry: -6, rz: 2.5, w: 265,
     texte:
-`Attends
+      `Attends
 
 Attends, Jacque le fourbe
 un haricot plat, un son de tôle
@@ -139,7 +139,7 @@ huile de toi
 Attends
 au revoir
 
-Atten,s`
+Attends`
   },
   {
     id: "bras",
@@ -148,7 +148,7 @@ Atten,s`
     source: "dictée",
     x: 22, y: 78, z: 80, ry: 7, rz: 2, w: 275,
     texte:
-`A bras le corps, titre de la sculpture,
+      `A bras le corps, titre de la sculpture,
 dont la vue me transporte vers une porte de l'esprit.
 Elle a la douceur du romantisme,
 un bronze un peu patiné,
@@ -165,7 +165,7 @@ bonne journée`
     source: "dictée — titre provisoire",
     x: 58, y: 80, z: 50, ry: -6, rz: -2.5, w: 300,
     texte:
-`Sans penser a rien, m'avale l'air du matin.
+      `Sans penser a rien, m'avale l'air du matin.
 Les tumultes de la nuit ont pris fin dans un bruit.
 J'aime emmener quelques mots, sortis de mon repos, en imaginant tes yeux pétillants, malicieux, et un peu bleu.
 Il y a plein de poésie dispersée au pied de mon lit.
